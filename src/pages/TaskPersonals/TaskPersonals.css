@@ -1,40 +1,52 @@
 /* Estilos generales */
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f4f7f6;
-  color: #333;
+  font-family: 'Roboto', sans-serif;
+  background-color: #e8f0f2;
+  color: #444;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
+  box-sizing: border-box;
 }
 
+/* Título */
 h1 {
-  color: #3498db;
-  font-size: 2.4rem;
+  color: #2d9cdb;
+  font-size: 3rem;
   text-align: center;
   font-weight: 700;
-  margin-bottom: 24px;
-  letter-spacing: -0.03rem;
-  background: linear-gradient(90deg, #3498db, #6a11cb);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #2d9cdb, #76c893);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: fadeIn 0.5s ease-out;
+  text-shadow: 0 3px 5px rgba(45, 156, 219, 0.2);
+  animation: fadeIn 0.8s ease-out;
 }
 
+/* Párrafos */
 p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   text-align: center;
   font-weight: 400;
   color: #555;
-  margin-bottom: 24px;
-  line-height: 1.6;
-  animation: fadeIn 0.5s ease-out;
+  margin-bottom: 30px;
+  line-height: 1.7;
+  padding: 0 20px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+p:hover {
+  color: #2d9cdb;
+  transform: translateY(-5px);
 }
 
 /* Animación */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -42,29 +54,74 @@ p {
   }
 }
 
-/* Efecto de sombra en el texto (opcional) */
-h1 {
-  text-shadow: 0 4px 6px rgba(52, 152, 219, 0.1);
-}
-
-/* Efecto de hover en los párrafos (opcional) */
-p:hover {
-  color: #3498db;
-  transition: color 0.3s ease;
-}
-
-/* Contenedor principal (opcional) */
+/* Contenedor principal */
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  max-width: 950px;
+  margin: 40px auto;
+  padding: 50px 40px;
   background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
 .container:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Detalles adicionales para hacer que el contenido resalte */
+.container h1,
+.container p {
+  padding: 0 20px;
+}
+
+.container h1 {
+  margin-top: 0;
+}
+
+/* Estilos de los botones (si aplican) */
+button {
+  background: #2d9cdb;
+  color: white;
+  padding: 18px 36px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 25px;
+}
+
+button:hover {
+  background: #1f8bb2;
+  transform: scale(1.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+
+  .container {
+    padding: 35px 20px;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px 30px;
+  }
 }
