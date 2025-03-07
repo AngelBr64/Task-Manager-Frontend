@@ -28,11 +28,11 @@ const MainLayout = ({ children }) => {
             <Link to="/dashboard">Grupos</Link>
           </Menu.Item>
           <Menu.Item key="2">
-            <Link to="/dashboard/tasks">Tareas</Link>
+            <Link to="/tasks">Tareas</Link>
           </Menu.Item>
           {rol === 'admin' && (
             <Menu.Item key="3">
-              <Link to="/dashboard/users">Usuarios</Link>
+              <Link to="/users">Usuarios</Link>
             </Menu.Item>
           )}
           <Menu.Item key="4" onClick={handleLogout} style={{ color: 'red' }}>
