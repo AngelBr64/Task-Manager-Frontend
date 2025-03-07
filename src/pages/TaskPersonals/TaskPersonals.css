@@ -1,0 +1,70 @@
+/* Estilos generales */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: #3498db;
+  font-size: 2.4rem;
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -0.03rem;
+  background: linear-gradient(90deg, #3498db, #6a11cb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeIn 0.5s ease-out;
+}
+
+p {
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 400;
+  color: #555;
+  margin-bottom: 24px;
+  line-height: 1.6;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efecto de sombra en el texto (opcional) */
+h1 {
+  text-shadow: 0 4px 6px rgba(52, 152, 219, 0.1);
+}
+
+/* Efecto de hover en los párrafos (opcional) */
+p:hover {
+  color: #3498db;
+  transition: color 0.3s ease;
+}
+
+/* Contenedor principal (opcional) */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
