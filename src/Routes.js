@@ -18,14 +18,14 @@ const AppRoutes = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Rutas protegidas para usuarios autenticados */}
+      {/* Rutas protegidas para usuarios autenticados x*/}
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<MainLayout><DashboardPage /></MainLayout>} />
-        <Route path="/dashboard/tasks" element={<MainLayout><TaskPersonals /></MainLayout>} />
+        <Route path="/tasks" element={<MainLayout><TaskPersonals /></MainLayout>} />
         
         {/* Ruta protegida adicionalmente para admins */}
         <Route element={<ProtectedRouteAdmin />}>
-          <Route path="/dashboard/users" element={<MainLayout><UsersPage /></MainLayout>} />
+          <Route path="/users" element={<MainLayout><UsersPage /></MainLayout>} />
         </Route>
       </Route>
     </Routes>
