@@ -1,127 +1,125 @@
-/* Estilos generales */
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #e8f0f2;
-  color: #444;
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  box-sizing: border-box;
-}
-
-/* Título */
-h1 {
-  color: #2d9cdb;
-  font-size: 3rem;
-  text-align: center;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, #2d9cdb, #76c893);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 3px 5px rgba(45, 156, 219, 0.2);
-  animation: fadeIn 0.8s ease-out;
-}
-
-/* Párrafos */
-p {
-  font-size: 1.1rem;
-  text-align: center;
-  font-weight: 400;
-  color: #555;
-  margin-bottom: 30px;
-  line-height: 1.7;
-  padding: 0 20px;
-  animation: fadeIn 0.8s ease-out;
-}
-
-p:hover {
-  color: #2d9cdb;
-  transform: translateY(-5px);
-}
-
-/* Animación */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Contenedor principal */
-.container {
-  max-width: 950px;
-  margin: 40px auto;
-  padding: 50px 40px;
   background-color: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
+  color: #333;
+  margin: 0;
+  padding: 20px;
 }
 
-.container:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+.task-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* Detalles adicionales para hacer que el contenido resalte */
-.container h1,
-.container p {
-  padding: 0 20px;
+h1 {
+  color: #333;
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.container h1 {
-  margin-top: 0;
+p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
 }
 
-/* Estilos de los botones (si aplican) */
-button {
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  padding: 10px;
+  min-height: 60vh;
+}
+
+.kanban-column {
+  flex: 1;
+  min-width: 280px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.kanban-column-header {
+  font-weight: 600;
+  padding: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+  background: #555;
+  color: white;
+  border-radius: 4px;
+}
+
+.kanban-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.kanban-task {
+  background: white;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.kanban-task:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.task-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.task-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.task-deadline {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.status-button, .delete-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.status-button {
   background: #2d9cdb;
   color: white;
-  padding: 18px 36px;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 25px;
 }
 
-button:hover {
-  background: #1f8bb2;
-  transform: scale(1.06);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+.delete-button {
+  background: #f44336;
+  color: white;
 }
 
-button:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Estilos responsivos */
 @media (max-width: 768px) {
+  .kanban-board {
+    flex-direction: column;
+  }
+  
+  .kanban-column {
+    min-width: 100%;
+  }
+  
   h1 {
-    font-size: 2.5rem;
-  }
-
-  p {
-    font-size: 1rem;
-  }
-
-  .container {
-    padding: 35px 20px;
-  }
-
-  button {
-    width: 100%;
-    padding: 15px 30px;
+    font-size: 1.8rem;
   }
 }

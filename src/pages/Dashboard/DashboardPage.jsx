@@ -1,6 +1,5 @@
-// frontend/src/pages/DashboardPage.jsx
 import React, { useState, useEffect } from 'react';
-import { FloatButton, Modal, Button, Select, message, Form } from 'antd';
+import { FloatButton, Modal, Button, Select, message, Form, Tag, Empty, Typography } from 'antd';
 import { PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import AuthService from '../../services/authService';
@@ -9,6 +8,8 @@ import GroupForm from '../../components/GroupForm';
 import UserListModal from '../../components/UserListModal';
 import KanbanBoard from '../../components/KanbanBoard';
 import './DashboardPage.css';
+
+const { Text } = Typography;
 
 const DashboardPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -19,11 +20,19 @@ const DashboardPage = () => {
   const [editingTask, setEditingTask] = useState(null);
   const userId = localStorage.getItem('userId');
   const username = localStorage.getItem('username');
+  const userRole = localStorage.getItem('rol') || 'user';
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
   const [groupForm] = Form.useForm();
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
+
+  // Permisos
+  const isAdmin = userRole === 'admin';
+  const isOwnerOfSelectedGroup = selectedGroup 
+    ? groups.some(group => group.id === selectedGroup && group.ownerId === userId)
+    : false;
+  const canModifyGroup = isAdmin || isOwnerOfSelectedGroup;
 
   const fetchTasks = async () => {
     if (!selectedGroup) return;
@@ -90,34 +99,31 @@ const DashboardPage = () => {
       const currentGroup = groups.find((group) => group.id === selectedGroup);
       const currentMembers = currentGroup.members || [];
 
-      // Usuarios que se agregarán (en selectedUsers pero no en currentMembers)
       const usersToAdd = selectedUsers.filter((userId) => !currentMembers.includes(userId));
-      // Usuarios que se eliminarán (en currentMembers pero no en selectedUsers)
       const usersToRemove = currentMembers.filter((userId) => !selectedUsers.includes(userId));
 
-      // Agregar usuarios
-      await Promise.all(
-        usersToAdd.map(async (userId) => {
+      await Promise.all([
+        ...usersToAdd.map(async (userId) => {
           await AuthService.addMemberToGroup(selectedGroup, userId);
-        })
-      );
-
-      // Eliminar usuarios
-      await Promise.all(
-        usersToRemove.map(async (userId) => {
+        }),
+        ...usersToRemove.map(async (userId) => {
           await AuthService.removeMemberFromGroup(selectedGroup, userId);
         })
-      );
+      ]);
 
       message.success('Miembros del grupo actualizados');
       setIsUserModalVisible(false);
-      fetchGroups(); // Actualizamos los grupos para reflejar los cambios
+      fetchGroups();
     } catch (err) {
       message.error('Error al actualizar los miembros del grupo');
     }
   };
 
   const handleDelete = async (taskId) => {
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden eliminar tareas');
+      return;
+    }
     try {
       await AuthService.deleteTask(taskId);
       message.success('Tarea eliminada exitosamente');
@@ -128,6 +134,10 @@ const DashboardPage = () => {
   };
 
   const handleClick = () => {
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden crear tareas');
+      return;
+    }
     setEditingTask(null);
     form.resetFields();
     setIsModalVisible(true);
@@ -139,7 +149,7 @@ const DashboardPage = () => {
         await AuthService.updateTask(editingTask.id, { ...values, userId });
         message.success('Tarea actualizada exitosamente');
       } else {
-        await AuthService.createTask({ ...values, userId });
+        await AuthService.createTask({ ...values, userId, group: selectedGroup });
         message.success('Tarea creada exitosamente');
       }
       setIsModalVisible(false);
@@ -157,6 +167,10 @@ const DashboardPage = () => {
   };
 
   const handleEdit = (task) => {
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden editar tareas');
+      return;
+    }
     setEditingTask(task);
     form.setFieldsValue({
       nameTask: task.nameTask,
@@ -169,6 +183,10 @@ const DashboardPage = () => {
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden cambiar estados');
+      return;
+    }
     try {
       await AuthService.updateTask(taskId, { status: newStatus });
       message.success('Estado de la tarea actualizado');
@@ -186,60 +204,96 @@ const DashboardPage = () => {
 
   const handleOpenUserModal = () => {
     const currentGroup = groups.find((group) => group.id === selectedGroup);
-    if (currentGroup && currentGroup.members) {
-      setSelectedUsers(currentGroup.members);
-    } else {
-      setSelectedUsers([]);
-    }
+    setSelectedUsers(currentGroup?.members || []);
     fetchUsers();
     setIsUserModalVisible(true);
   };
 
   return (
-    <div>
-      <h1>Hola, {username}</h1>
-      <p>Gestiona tus tareas de manera eficiente.</p>
-      <Select
-        placeholder="Selecciona un grupo"
-        style={{ width: '100%', marginBottom: '16px' }}
-        onChange={setSelectedGroup}
-      >
-        {groups.map((group) => (
-          <Select.Option key={group.id} value={group.id}>
-            {group.name}
-          </Select.Option>
-        ))}
-      </Select>
-      <Button type="primary" onClick={() => setIsGroupModalVisible(true)}>
-        Crear Grupo
-      </Button>
-      {selectedGroup &&
-        groups.some((group) => group.id === selectedGroup && group.ownerId === userId) && (
-          <Button
-            className="add-user-button"
-            type="default"
-            icon={<UserAddOutlined />}
-            onClick={handleOpenUserModal}
-          >
-            Agregar Miembros
-          </Button>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Hola, {username} {isAdmin && <Tag color="gold">Admin</Tag>}</h1>
+        <p>Gestiona tus tareas de grupo</p>
+      </div>
+
+      <div className="group-controls">
+        {groups.length > 0 ? (
+          <>
+            <Select
+              placeholder="Selecciona un grupo"
+              style={{ width: '100%', marginBottom: '16px' }}
+              onChange={setSelectedGroup}
+              value={selectedGroup}
+              allowClear
+            >
+              {groups.map((group) => (
+                <Select.Option key={group.id} value={group.id}>
+                  {group.name} 
+                  {group.ownerId === userId && <Tag color="blue">Dueño</Tag>}
+                </Select.Option>
+              ))}
+            </Select>
+
+            <div className="group-actions">
+              {isAdmin && (
+                <Button 
+                  type="primary" 
+                  onClick={() => setIsGroupModalVisible(true)}
+                  style={{ marginRight: 8 }}
+                >
+                  Crear Grupo
+                </Button>
+              )}
+              
+              {selectedGroup && canModifyGroup && (
+                <Button
+                  icon={<UserAddOutlined />}
+                  onClick={handleOpenUserModal}
+                >
+                  Gestionar Miembros
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          <Empty
+            description={
+              <>
+                <Text>No tienes ningún grupo asignado aún</Text>
+                {isAdmin && (
+                  <Button 
+                    type="primary" 
+                    onClick={() => setIsGroupModalVisible(true)}
+                    style={{ marginTop: 16 }}
+                  >
+                    Crear tu primer grupo
+                  </Button>
+                )}
+              </>
+            }
+          />
         )}
+      </div>
 
-      <KanbanBoard
-        tasksByStatus={tasksByStatus}
-        isOwner={groups.some((group) => group.ownerId === userId)}
-        handleEdit={handleEdit}
-        handleDelete={handleDelete}
-        handleStatusChange={handleStatusChange}
-      />
+      {selectedGroup && (
+        <>
+          <KanbanBoard
+            tasksByStatus={tasksByStatus}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            handleStatusChange={handleStatusChange}
+          />
 
-      {groups.some((group) => group.ownerId === userId) && (
-        <FloatButton
-          icon={<PlusOutlined />}
-          type="primary"
-          onClick={handleClick}
-          style={{ right: 24, bottom: 24 }}
-        />
+          {canModifyGroup && (
+            <FloatButton
+              icon={<PlusOutlined />}
+              type="primary"
+              onClick={handleClick}
+              tooltip="Crear tarea"
+              style={{ right: 24, bottom: 24 }}
+            />
+          )}
+        </>
       )}
 
       <Modal
@@ -247,8 +301,14 @@ const DashboardPage = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
+        destroyOnClose
       >
-        <TaskForm form={form} onFinish={onFinish} editingTask={editingTask} groups={groups} />
+        <TaskForm 
+          form={form} 
+          onFinish={onFinish} 
+          editingTask={editingTask} 
+          selectedGroup={selectedGroup}
+        />
       </Modal>
 
       <Modal
@@ -256,6 +316,7 @@ const DashboardPage = () => {
         visible={isGroupModalVisible}
         onCancel={() => setIsGroupModalVisible(false)}
         footer={null}
+        destroyOnClose
       >
         <GroupForm form={groupForm} onFinish={handleCreateGroup} />
       </Modal>

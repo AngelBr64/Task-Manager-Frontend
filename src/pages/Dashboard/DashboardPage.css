@@ -1,175 +1,141 @@
-/* Estilos generales para el Dashboard */
-body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f4f6f9;
-  color: #333;
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Título del Dashboard */
 h1 {
   color: #2d9cdb;
-  font-family: 'Roboto', sans-serif;
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 3rem;
-  font-weight: 700;
-  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
 }
 
-/* Descripción breve del Dashboard */
-p {
-  font-size: 1.1rem;
-  text-align: center;
-  color: #555;
-  margin-bottom: 30px;
-  font-style: normal;
-}
-
-/* Estilos para el tablero Kanban en el Dashboard */
-.dashboard-board {
+.group-controls {
   display: flex;
-  gap: 30px;
-  margin-top: 40px;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Estilos para el tablero Kanban */
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
   overflow-x: auto;
-  justify-content: space-between;
+  min-height: 60vh;
 }
 
-/* Estilos de las columnas del tablero Kanban */
-.dashboard-column {
+.kanban-column {
   flex: 1;
-  min-width: 280px;
-  background-color: #fff;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
+  min-width: 300px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
 }
 
-.dashboard-column:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.kanban-column-header {
+  font-weight: 600;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+  color: white;
+  border-radius: 6px;
+  font-size: 1.1rem;
 }
 
-.dashboard-column:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  background: linear-gradient(90deg, #2d9cdb, #4CAF50);
-  border-radius: 15px 15px 0 0;
+.kanban-column[data-status="Pendiente"] .kanban-column-header {
+  background: #ff6b6b;
 }
 
-/* Estilos de las tareas dentro de las columnas */
-.dashboard-task {
-  margin-bottom: 20px;
-  border-radius: 10px;
-  background-color: #f4f6f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 18px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
+.kanban-column[data-status="En progreso"] .kanban-column-header {
+  background: #feca57;
 }
 
-.dashboard-task:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+.kanban-column[data-status="Completada"] .kanban-column-header {
+  background: #1dd1a1;
+}
+
+.kanban-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.kanban-task {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.kanban-task:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.kanban-task.group {
+  border-left: 4px solid #4CAF50;
+}
+
+.kanban-task.personal {
+  border-left: 4px solid #2d9cdb;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .task-title {
   font-weight: 600;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  font-size: 1.1rem;
   color: #333;
 }
 
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .task-description {
-  color: #666;
-  font-size: 0.95rem;
-  margin-bottom: 10px;
+  color: #555;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .task-deadline {
-  color: #888;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
+  font-size: 0.8rem;
+  color: #666;
 }
 
-.task-status {
-  font-size: 1rem;
-  color: #4CAF50;
-  font-weight: 600;
-  margin-top: 10px;
-  text-transform: uppercase;
-}
-
-/* Botón de agregar usuario en el Dashboard */
-.add-user-button {
-  margin-left: 10px;
-  background-color: #2d9cdb;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  font-size: 1rem;
-  display: inline-block;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.add-user-button:hover {
-  background-color: #1f8bb2;
-  transform: translateY(-2px);
-}
-
-.add-user-button:active {
-  transform: translateY(2px);
-}
-
-/* Animación para las tareas */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Estilos responsivos */
+/* Responsive */
 @media (max-width: 768px) {
-  .dashboard-board {
+  .kanban-board {
     flex-direction: column;
   }
-
-  .dashboard-column {
+  
+  .kanban-column {
     min-width: 100%;
-    margin-bottom: 20px;
   }
-
-  h1 {
-    font-size: 2.2rem;
+  
+  .group-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
-
-  p {
-    font-size: 1rem;
-  }
-
-  .add-user-button {
-    font-size: 0.9rem;
-    padding: 10px 20px;
+  
+  .group-controls > * {
+    margin: 5px 0 !important;
   }
 }

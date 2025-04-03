@@ -1,54 +1,69 @@
-import React from 'react';
-import { Card, Select, Button } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
-const KanbanBoard = ({ tasksByStatus, isOwner, handleEdit, handleDelete, handleStatusChange }) => {
+// Cambia esto:
+// export const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
+
+// Por esto (exportación por defecto):
+const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
+  const onDragEnd = (result) => {
+    const { source, destination } = result;
+    
+    if (!destination) return;
+
+    handleStatusChange(
+      result.draggableId,
+      destination.droppableId.split('-')[1] 
+    );
+  };
+
   return (
-    <div className="kanban-board">
-      {Object.entries(tasksByStatus).map(([status, tasks]) => (
-        <Card key={status} title={status} className="kanban-column">
-          {tasks.map((task) => (
-            <Card
-              key={task.id}
-              className="kanban-task"
-              actions={isOwner ? [
-                <Button
-                  type="link"
-                  icon={<EditOutlined />}
-                  onClick={() => handleEdit(task)}
-                />,
-                <Button
-                  type="link"
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(task.id)}
-                />,
-              ] : []}
-            >
-              <div className="task-content">
-                <div className="task-title">{task.nameTask}</div>
-                <div className="task-description">{task.description}</div>
-                <div className="task-deadline">
-                  <strong>Fecha límite:</strong>{' '}
-                  {task.deadline ? new Date(task.deadline).toLocaleDateString() : 'Sin fecha'}
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="kanban-board">
+        {Object.entries(tasksByStatus).map(([status, tasks], columnIndex) => (
+          <Droppable key={status} droppableId={`column-${columnIndex}-${status}`}>
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="kanban-column"
+                data-status={status}
+              >
+                <div className="kanban-column-header">{status}</div>
+                <div className="kanban-tasks">
+                  {tasks.map((task, taskIndex) => (
+                    <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`kanban-task ${task.groupId ? 'group' : 'personal'}`}
+                          onClick={() => console.log('Task clicked:', task.id)}
+                        >
+                          <span className={`task-badge ${task.groupId ? 'group' : 'personal'}`}>
+                            {task.groupId ? 'Grupo' : 'Personal'}
+                          </span>
+                          <h4 className="task-title">{task.nameTask}</h4>
+                          {task.description && <p className="task-description">{task.description}</p>}
+                          {task.deadline && (
+                            <div className="task-deadline">
+                              📅 {new Date(task.deadline).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
                 </div>
-                <div className="task-status">
-                  <Select
-                    defaultValue={task.status}
-                    style={{ width: '100%', marginTop: '8px' }}
-                    onChange={(value) => handleStatusChange(task.id, value)}
-                  >
-                    <Select.Option value="Pendiente">Pendiente</Select.Option>
-                    <Select.Option value="En progreso">En progreso</Select.Option>
-                    <Select.Option value="Completada">Completada</Select.Option>
-                  </Select>
-                </div>
+                {provided.placeholder}
               </div>
-            </Card>
-          ))}
-        </Card>
-      ))}
-    </div>
+            )}
+          </Droppable>
+        ))}
+      </div>
+    </DragDropContext>
   );
 };
 
+// Añade esta línea al final:
 export default KanbanBoard;

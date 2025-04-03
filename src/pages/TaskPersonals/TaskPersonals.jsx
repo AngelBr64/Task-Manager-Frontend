@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { message } from "antd";
 import AuthService from "../../services/authService";
-import TaskCard from "../../components/TaskCard";
 import FormTask from "../../components/FormTask";
 import FloatingButton from "../../components/FloatButton";
+import "./TaskPersonals.css";
 
 const TaskPersonals = () => {
   const [tasks, setTasks] = useState([]);
@@ -25,6 +25,12 @@ const TaskPersonals = () => {
     fetchTasks();
   }, []);
 
+  const tasksByStatus = {
+    Pendiente: tasks.filter(task => task.status === "Pendiente"),
+    "En progreso": tasks.filter(task => task.status === "En progreso"),
+    Completada: tasks.filter(task => task.status === "Completada")
+  };
+
   const handleAddTask = () => {
     setEditingTask(null);
     setIsModalVisible(true);
@@ -45,8 +51,23 @@ const TaskPersonals = () => {
     }
   };
 
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      await AuthService.updateTask(taskId, { status: newStatus });
+      message.success("Estado actualizado");
+      fetchTasks();
+    } catch (err) {
+      message.error("Error al actualizar el estado");
+    }
+  };
+
   const handleFinishTask = async (values) => {
-    const formattedValues = { ...values, userId, deadline: values.deadline?.toISOString() };
+    const formattedValues = { 
+      ...values, 
+      userId, 
+      deadline: values.deadline?.toISOString(),
+      status: values.status || "Pendiente"
+    };
     
     try {
       if (editingTask) {
@@ -64,17 +85,66 @@ const TaskPersonals = () => {
   };
 
   return (
-    <div>
+    <div className="task-container">
       <h1>Bienvenido, {username}</h1>
-      <p>Tus Tareas</p>
+      <p>Tus tareas personales</p>
 
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} onEdit={handleEditTask} onDelete={handleDeleteTask} />
-      ))}
+      <div className="kanban-board">
+        {Object.entries(tasksByStatus).map(([status, tasks]) => (
+          <div key={status} className="kanban-column" data-status={status}>
+            <div className="kanban-column-header">{status}</div>
+            <div className="kanban-tasks">
+              {tasks.map((task) => (
+                <div 
+                  key={task.id} 
+                  className="kanban-task"
+                  onClick={() => handleEditTask(task)}
+                >
+                  <span className="task-title">{task.nameTask}</span>
+                  {task.description && <p className="task-description">{task.description}</p>}
+                  {task.deadline && (
+                    <div className="task-deadline">
+                      📅 {new Date(task.deadline).toLocaleDateString()}
+                    </div>
+                  )}
+                  <div className="task-actions">
+                    <button 
+                      className="status-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newStatus = 
+                          status === "Pendiente" ? "En progreso" :
+                          status === "En progreso" ? "Completada" : "Pendiente";
+                        handleStatusChange(task.id, newStatus);
+                      }}
+                    >
+                      Cambiar estado
+                    </button>
+                    <button 
+                      className="delete-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteTask(task.id);
+                      }}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <FloatingButton onClick={handleAddTask} />
 
-      <FormTask visible={isModalVisible} onClose={() => setIsModalVisible(false)} onFinish={handleFinishTask} initialValues={editingTask} />
+      <FormTask 
+        visible={isModalVisible} 
+        onClose={() => setIsModalVisible(false)} 
+        onFinish={handleFinishTask} 
+        initialValues={editingTask} 
+      />
     </div>
   );
 };
