@@ -1,10 +1,10 @@
+import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Button } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import './KanbanBoard.css';
 
-// Cambia esto:
-// export const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
-
-// Por esto (exportación por defecto):
-const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
+const KanbanBoard = ({ tasksByStatus, onTaskClick, handleDelete, handleStatusChange }) => {
   const onDragEnd = (result) => {
     const { source, destination } = result;
     
@@ -12,7 +12,7 @@ const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
 
     handleStatusChange(
       result.draggableId,
-      destination.droppableId.split('-')[1] 
+      destination.droppableId.split('-')[1]
     );
   };
 
@@ -38,7 +38,7 @@ const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           className={`kanban-task ${task.groupId ? 'group' : 'personal'}`}
-                          onClick={() => console.log('Task clicked:', task.id)}
+                          onClick={() => onTaskClick(task)}
                         >
                           <span className={`task-badge ${task.groupId ? 'group' : 'personal'}`}>
                             {task.groupId ? 'Grupo' : 'Personal'}
@@ -50,6 +50,23 @@ const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
                               📅 {new Date(task.deadline).toLocaleDateString()}
                             </div>
                           )}
+                          <div className="task-actions">
+                            <Button 
+                              icon={<EditOutlined />} 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onTaskClick(task);
+                              }}
+                            />
+                            <Button 
+                              icon={<DeleteOutlined />} 
+                              danger 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(task.id);
+                              }}
+                            />
+                          </div>
                         </div>
                       )}
                     </Draggable>
@@ -65,5 +82,4 @@ const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
   );
 };
 
-// Añade esta línea al final:
 export default KanbanBoard;

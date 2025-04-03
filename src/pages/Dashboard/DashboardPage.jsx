@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FloatButton, Modal, Button, Select, message, Form, Tag, Empty, Typography } from 'antd';
-import { PlusOutlined, UserAddOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import AuthService from '../../services/authService';
 import TaskForm from '../../components/TaskFormGroup';
@@ -272,7 +272,7 @@ const DashboardPage = () => {
         <>
           <KanbanBoard
             tasksByStatus={tasksByStatus}
-            handleEdit={handleEdit}
+            onTaskClick={handleEdit}
             handleDelete={handleDelete}
           />
 
@@ -292,7 +292,30 @@ const DashboardPage = () => {
         title={editingTask ? 'Editar Tarea' : 'Agregar Nueva Tarea'}
         visible={isModalVisible}
         onCancel={handleCancel}
-        footer={null}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancelar
+          </Button>,
+          editingTask && (
+            <Button 
+              key="delete" 
+              danger 
+              onClick={() => {
+                handleDelete(editingTask.id);
+                setIsModalVisible(false);
+              }}
+            >
+              Eliminar
+            </Button>
+          ),
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={() => form.submit()}
+          >
+            {editingTask ? 'Actualizar' : 'Guardar'}
+          </Button>,
+        ]}
         destroyOnClose
       >
         <TaskForm 
