@@ -27,12 +27,13 @@ const DashboardPage = () => {
   const [groupForm] = Form.useForm();
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
 
-  // Permisos
+  // Permissions
   const isAdmin = userRole === 'admin';
   const isOwnerOfSelectedGroup = selectedGroup 
     ? groups.some(group => group.id === selectedGroup && group.ownerId === userId)
     : false;
   const canModifyGroup = isAdmin || isOwnerOfSelectedGroup;
+  const canManageTasks = isAdmin || isOwnerOfSelectedGroup; // For task operations
 
   const fetchTasks = async () => {
     if (!selectedGroup) return;
@@ -120,7 +121,7 @@ const DashboardPage = () => {
   };
 
   const handleDelete = async (taskId) => {
-    if (!canModifyGroup) {
+    if (!canManageTasks) {
       message.warning('Solo administradores o dueños del grupo pueden eliminar tareas');
       return;
     }
@@ -134,7 +135,7 @@ const DashboardPage = () => {
   };
 
   const handleClick = () => {
-    if (!canModifyGroup) {
+    if (!canManageTasks) {
       message.warning('Solo administradores o dueños del grupo pueden crear tareas');
       return;
     }
@@ -167,7 +168,7 @@ const DashboardPage = () => {
   };
 
   const handleEdit = (task) => {
-    if (!canModifyGroup) {
+    if (!canManageTasks) {
       message.warning('Solo administradores o dueños del grupo pueden editar tareas');
       return;
     }
@@ -183,7 +184,7 @@ const DashboardPage = () => {
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
-    if (!canModifyGroup) {
+    if (!canManageTasks) {
       message.warning('Solo administradores o dueños del grupo pueden cambiar estados');
       return;
     }
@@ -284,7 +285,7 @@ const DashboardPage = () => {
             handleStatusChange={handleStatusChange}
           />
 
-          {canModifyGroup && (
+          {canManageTasks && (
             <FloatButton
               icon={<PlusOutlined />}
               type="primary"
