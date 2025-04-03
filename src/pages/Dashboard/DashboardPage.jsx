@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FloatButton, Modal, Button, Select, message, Form, Tag } from 'antd';
+import { FloatButton, Modal, Button, Select, message, Form, Tag, Empty, Typography } from 'antd';
 import { PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import AuthService from '../../services/authService';
@@ -8,6 +8,8 @@ import GroupForm from '../../components/GroupForm';
 import UserListModal from '../../components/UserListModal';
 import KanbanBoard from '../../components/KanbanBoard';
 import './DashboardPage.css';
+
+const { Text } = Typography;
 
 const DashboardPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -215,39 +217,62 @@ const DashboardPage = () => {
       </div>
 
       <div className="group-controls">
-        <Select
-          placeholder="Selecciona un grupo"
-          style={{ width: '100%', marginBottom: '16px' }}
-          onChange={setSelectedGroup}
-          value={selectedGroup}
-          allowClear
-        >
-          {groups.map((group) => (
-            <Select.Option key={group.id} value={group.id}>
-              {group.name} 
-              {group.ownerId === userId && <Tag color="blue">Dueño</Tag>}
-            </Select.Option>
-          ))}
-        </Select>
-
-        <div className="group-actions">
-          <Button 
-            type="primary" 
-            onClick={() => setIsGroupModalVisible(true)}
-            style={{ marginRight: 8 }}
-          >
-            Crear Grupo
-          </Button>
-          
-          {selectedGroup && canModifyGroup && (
-            <Button
-              icon={<UserAddOutlined />}
-              onClick={handleOpenUserModal}
+        {groups.length > 0 ? (
+          <>
+            <Select
+              placeholder="Selecciona un grupo"
+              style={{ width: '100%', marginBottom: '16px' }}
+              onChange={setSelectedGroup}
+              value={selectedGroup}
+              allowClear
             >
-              Gestionar Miembros
-            </Button>
-          )}
-        </div>
+              {groups.map((group) => (
+                <Select.Option key={group.id} value={group.id}>
+                  {group.name} 
+                  {group.ownerId === userId && <Tag color="blue">Dueño</Tag>}
+                </Select.Option>
+              ))}
+            </Select>
+
+            <div className="group-actions">
+              {isAdmin && (
+                <Button 
+                  type="primary" 
+                  onClick={() => setIsGroupModalVisible(true)}
+                  style={{ marginRight: 8 }}
+                >
+                  Crear Grupo
+                </Button>
+              )}
+              
+              {selectedGroup && canModifyGroup && (
+                <Button
+                  icon={<UserAddOutlined />}
+                  onClick={handleOpenUserModal}
+                >
+                  Gestionar Miembros
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          <Empty
+            description={
+              <>
+                <Text>No tienes ningún grupo asignado aún</Text>
+                {isAdmin && (
+                  <Button 
+                    type="primary" 
+                    onClick={() => setIsGroupModalVisible(true)}
+                    style={{ marginTop: 16 }}
+                  >
+                    Crear tu primer grupo
+                  </Button>
+                )}
+              </>
+            }
+          />
+        )}
       </div>
 
       {selectedGroup && (
@@ -283,6 +308,7 @@ const DashboardPage = () => {
           onFinish={onFinish} 
           editingTask={editingTask} 
           selectedGroup={selectedGroup}
+          groups={groups}
         />
       </Modal>
 

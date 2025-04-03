@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Select, DatePicker, Button } from 'antd';
 import moment from 'moment';
 
-const TaskFormGroup = ({ form, onFinish, editingTask, groups }) => {
+const TaskFormGroup = ({ form, onFinish, editingTask, selectedGroup, groups = [] }) => {
   return (
     <Form form={form} onFinish={onFinish} layout="vertical">
       <Form.Item
@@ -53,19 +53,21 @@ const TaskFormGroup = ({ form, onFinish, editingTask, groups }) => {
         </Select>
       </Form.Item>
 
-      <Form.Item
-        label="Grupo"
-        name="group"
-        rules={[{ required: true, message: 'Por favor selecciona un grupo' }]}
-      >
-        <Select placeholder="Selecciona un grupo" loading={groups.length === 0}>
-          {groups.map(group => (
-            <Select.Option key={group.id} value={group.id}>
-              {group.name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+      {!selectedGroup && (
+        <Form.Item
+          label="Grupo"
+          name="group"
+          rules={[{ required: true, message: 'Por favor selecciona un grupo' }]}
+        >
+          <Select placeholder="Selecciona un grupo" loading={groups.length === 0}>
+            {groups.map(group => (
+              <Select.Option key={group.id} value={group.id}>
+                {group.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      )}
 
       <Form.Item>
         <Button type="primary" htmlType="submit">
