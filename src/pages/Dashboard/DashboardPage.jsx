@@ -120,8 +120,8 @@ const DashboardPage = () => {
   };
 
   const handleDelete = async (taskId) => {
-    if (!isAdmin) {
-      message.warning('Solo administradores pueden eliminar tareas');
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden eliminar tareas');
       return;
     }
     try {
@@ -167,8 +167,8 @@ const DashboardPage = () => {
   };
 
   const handleEdit = (task) => {
-    if (!isAdmin) {
-      message.warning('Solo administradores pueden editar tareas');
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden editar tareas');
       return;
     }
     setEditingTask(task);
@@ -180,6 +180,20 @@ const DashboardPage = () => {
       status: task.status,
     });
     setIsModalVisible(true);
+  };
+
+  const handleStatusChange = async (taskId, newStatus) => {
+    if (!canModifyGroup) {
+      message.warning('Solo administradores o dueños del grupo pueden cambiar estados');
+      return;
+    }
+    try {
+      await AuthService.updateTask(taskId, { status: newStatus });
+      message.success('Estado de la tarea actualizado');
+      fetchTasks();
+    } catch (err) {
+      message.error('Error en el servidor');
+    }
   };
 
   const tasksByStatus = {
@@ -267,7 +281,7 @@ const DashboardPage = () => {
             tasksByStatus={tasksByStatus}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
-            isAdmin={isAdmin} // Pasamos esta prop al KanbanBoard
+            handleStatusChange={handleStatusChange}
           />
 
           {canModifyGroup && (
