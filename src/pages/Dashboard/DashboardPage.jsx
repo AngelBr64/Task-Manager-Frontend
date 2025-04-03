@@ -27,13 +27,12 @@ const DashboardPage = () => {
   const [groupForm] = Form.useForm();
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
 
-  // Permissions
+  // Permisos
   const isAdmin = userRole === 'admin';
   const isOwnerOfSelectedGroup = selectedGroup 
     ? groups.some(group => group.id === selectedGroup && group.ownerId === userId)
     : false;
   const canModifyGroup = isAdmin || isOwnerOfSelectedGroup;
-  const canManageTasks = isAdmin || isOwnerOfSelectedGroup; // For task operations
 
   const fetchTasks = async () => {
     if (!selectedGroup) return;
@@ -121,8 +120,8 @@ const DashboardPage = () => {
   };
 
   const handleDelete = async (taskId) => {
-    if (!canManageTasks) {
-      message.warning('Solo administradores o dueños del grupo pueden eliminar tareas');
+    if (!isAdmin) {
+      message.warning('Solo administradores pueden eliminar tareas');
       return;
     }
     try {
@@ -135,7 +134,7 @@ const DashboardPage = () => {
   };
 
   const handleClick = () => {
-    if (!canManageTasks) {
+    if (!canModifyGroup) {
       message.warning('Solo administradores o dueños del grupo pueden crear tareas');
       return;
     }
@@ -168,8 +167,8 @@ const DashboardPage = () => {
   };
 
   const handleEdit = (task) => {
-    if (!canManageTasks) {
-      message.warning('Solo administradores o dueños del grupo pueden editar tareas');
+    if (!isAdmin) {
+      message.warning('Solo administradores pueden editar tareas');
       return;
     }
     setEditingTask(task);
@@ -181,20 +180,6 @@ const DashboardPage = () => {
       status: task.status,
     });
     setIsModalVisible(true);
-  };
-
-  const handleStatusChange = async (taskId, newStatus) => {
-    if (!canManageTasks) {
-      message.warning('Solo administradores o dueños del grupo pueden cambiar estados');
-      return;
-    }
-    try {
-      await AuthService.updateTask(taskId, { status: newStatus });
-      message.success('Estado de la tarea actualizado');
-      fetchTasks();
-    } catch (err) {
-      message.error('Error en el servidor');
-    }
   };
 
   const tasksByStatus = {
@@ -282,10 +267,10 @@ const DashboardPage = () => {
             tasksByStatus={tasksByStatus}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
-            handleStatusChange={handleStatusChange}
+            isAdmin={isAdmin} // Pasamos esta prop al KanbanBoard
           />
 
-          {canManageTasks && (
+          {canModifyGroup && (
             <FloatButton
               icon={<PlusOutlined />}
               type="primary"

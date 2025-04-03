@@ -1,69 +1,59 @@
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import React from 'react';
+import { Card, Tag } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
-// Cambia esto:
-// export const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
-
-// Por esto (exportación por defecto):
-const KanbanBoard = ({ tasksByStatus, handleStatusChange }) => {
-  const onDragEnd = (result) => {
-    const { source, destination } = result;
-    
-    if (!destination) return;
-
-    handleStatusChange(
-      result.draggableId,
-      destination.droppableId.split('-')[1] 
-    );
-  };
+const KanbanBoard = ({ tasksByStatus, handleEdit, handleDelete, isAdmin }) => {
+  const statusColumns = [
+    { title: 'Pendiente', key: 'Pendiente', color: 'volcano' },
+    { title: 'En progreso', key: 'En progreso', color: 'geekblue' },
+    { title: 'Completada', key: 'Completada', color: 'green' },
+  ];
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="kanban-board">
-        {Object.entries(tasksByStatus).map(([status, tasks], columnIndex) => (
-          <Droppable key={status} droppableId={`column-${columnIndex}-${status}`}>
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="kanban-column"
-                data-status={status}
+    <div className="kanban-board">
+      {statusColumns.map((column) => (
+        <div key={column.key} className="kanban-column">
+          <h3>
+            <Tag color={column.color}>{column.title}</Tag>
+            <span className="task-count">({tasksByStatus[column.key]?.length || 0})</span>
+          </h3>
+          <div className="kanban-cards">
+            {tasksByStatus[column.key]?.map((task) => (
+              <Card
+                key={task.id}
+                className="kanban-card"
+                actions={isAdmin ? [
+                  <EditOutlined 
+                    key="edit" 
+                    onClick={() => handleEdit(task)} 
+                    className="edit-icon" 
+                  />,
+                  <DeleteOutlined 
+                    key="delete" 
+                    onClick={() => handleDelete(task.id)} 
+                    className="delete-icon" 
+                  />
+                ] : []}
               >
-                <div className="kanban-column-header">{status}</div>
-                <div className="kanban-tasks">
-                  {tasks.map((task, taskIndex) => (
-                    <Draggable key={task.id} draggableId={task.id} index={taskIndex}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`kanban-task ${task.groupId ? 'group' : 'personal'}`}
-                          onClick={() => console.log('Task clicked:', task.id)}
-                        >
-                          <span className={`task-badge ${task.groupId ? 'group' : 'personal'}`}>
-                            {task.groupId ? 'Grupo' : 'Personal'}
-                          </span>
-                          <h4 className="task-title">{task.nameTask}</h4>
-                          {task.description && <p className="task-description">{task.description}</p>}
-                          {task.deadline && (
-                            <div className="task-deadline">
-                              📅 {new Date(task.deadline).toLocaleDateString()}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
+                <div className="task-content">
+                  <h4 className="task-title">{task.nameTask}</h4>
+                  <p className="task-description">{task.description}</p>
+                  <div className="task-meta">
+                    <Tag color="purple">{task.category}</Tag>
+                    {task.deadline && (
+                      <Tag color="orange">
+                        📅 {new Date(task.deadline).toLocaleDateString()}
+                      </Tag>
+                    )}
+                  </div>
                 </div>
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        ))}
-      </div>
-    </DragDropContext>
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
-// Añade esta línea al final:
 export default KanbanBoard;
