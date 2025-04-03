@@ -120,10 +120,14 @@ const DashboardPage = () => {
   };
 
   const handleDelete = async (taskId) => {
-    if (!canModifyGroup) {
-      message.warning('Solo administradores o dueños del grupo pueden eliminar tareas');
+    const task = tasks.find(t => t.id === taskId);
+    const canDelete = isAdmin || isOwnerOfSelectedGroup || (task && task.userId === userId);
+    
+    if (!canDelete) {
+      message.warning('No tienes permisos para eliminar esta tarea');
       return;
     }
+
     try {
       await AuthService.deleteTask(taskId);
       message.success('Tarea eliminada exitosamente');
@@ -167,10 +171,13 @@ const DashboardPage = () => {
   };
 
   const handleEdit = (task) => {
-    if (!canModifyGroup) {
-      message.warning('Solo administradores o dueños del grupo pueden editar tareas');
+    const canEdit = isAdmin || isOwnerOfSelectedGroup || task.userId === userId;
+    
+    if (!canEdit) {
+      message.warning('No tienes permisos para editar esta tarea');
       return;
     }
+    
     setEditingTask(task);
     form.setFieldsValue({
       nameTask: task.nameTask,
@@ -180,20 +187,6 @@ const DashboardPage = () => {
       status: task.status,
     });
     setIsModalVisible(true);
-  };
-
-  const handleStatusChange = async (taskId, newStatus) => {
-    if (!canModifyGroup) {
-      message.warning('Solo administradores o dueños del grupo pueden cambiar estados');
-      return;
-    }
-    try {
-      await AuthService.updateTask(taskId, { status: newStatus });
-      message.success('Estado de la tarea actualizado');
-      fetchTasks();
-    } catch (err) {
-      message.error('Error en el servidor');
-    }
   };
 
   const tasksByStatus = {
@@ -281,7 +274,6 @@ const DashboardPage = () => {
             tasksByStatus={tasksByStatus}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
-            handleStatusChange={handleStatusChange}
           />
 
           {canModifyGroup && (
